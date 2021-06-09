@@ -24,9 +24,11 @@ const triggerQ = () => {
         name: "mainPage",
         choices: [
             'view employees',
+            'view role',
+            'view department',
             'edit/remove/add employee',
             'add department',
-            'add role',
+            'add role'
         ]
     }).then((ans) => {
         switch (ans.mainPage) {
@@ -38,8 +40,16 @@ const triggerQ = () => {
                 edit_remove_add_employee();
             break;
 
+            case "view department":
+                view_department();
+            break;
+
             case "add department":
                 add_department();
+            break;
+
+            case "view role":
+                view_role();
             break;
 
             case "add role":
@@ -364,3 +374,26 @@ const getDept = () => {
         })
       return updatedDept
 };
+
+const view_role = () => {
+    connection.query(
+        `SELECT role.title, role.salary, department.name FROM employee
+        INNER JOIN role on role.id = employee.role_id
+        INNER JOIN department on department.id = role.department_id`,
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      triggerQ()
+  })
+}
+const view_department = () => {
+    connection.query(
+        `SELECT employee.last_name, department.name FROM employee
+        INNER JOIN role on role.id = employee.role_id
+        INNER JOIN department on department.id = role.department_id`,
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      triggerQ()
+  })
+}
