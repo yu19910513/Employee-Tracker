@@ -51,7 +51,7 @@ const triggerQ = () => {
 
 const view_all_employees = () => {
     connection.query(
-        `SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, role.manager FROM employee
+        `SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, role.manager, manager_id FROM employee
         INNER JOIN role on role.id = employee.role_id
         INNER JOIN department on department.id = role.department_id`,
     function(err, res) {
@@ -134,13 +134,13 @@ const remove = (res) => {
                 connection.query(`DELETE FROM employee WHERE id = ${res[0].id}`)
             });
             console.log(`${ans.choice} is fired!`);
-            proceed_or_home()
-        } else {proceed_or_home()}
+            delete_or_home()
+        } else {delete_or_home()}
     })
 
 };
 
-const proceed_or_home = () => {
+const delete_or_home = () => {
     inquirer.prompt({
         type: "list",
         message: "choose one of the following options",
@@ -173,7 +173,45 @@ const add_employee = () => {
             choices: getrole()
         },
 
-    ]).then((ans)=>{})
+    ]).then((ans)=>{
+        var id = getrole().indexOf(ans.role) + 1;
+        connection.query("INSERT INTO employee SET ?",
+      {
+          first_name: ans.first_name,
+          last_name: ans.last_name,
+          role_id: id
+      });
+      managerUpdate(ans);
+      add_or_home();
+    })
+};
+
+
+const managerUpdate = (ans) => {
+    if (ans.role == 'manager') {
+        connection.query(`SELECT id from employee WHERE employee.last_name = '${ans.last_name}'`, function(err, res) {
+            if (err) throw err
+            connection.query(`update employee set manager_id = ${res[0].id} WHERE id = ${res[0].id}`, function(err, res) {
+                if (err) throw err
+            })
+        })
+      } console.log(`new ${ans.role} was added!`);
+}
+
+
+
+const add_or_home = () => {
+    inquirer.prompt({
+        type: "list",
+        message: "choose one of the following options",
+        name: "go",
+        choices: ['go back', 'add more people?']
+    })
+    .then((ans) => {
+        if (ans.go == 'go back') {
+            triggerQ();
+        } else {add_employee()}
+    })
 };
 
 var updatedRole = [];
@@ -185,7 +223,62 @@ const getrole = () => {
                 }
         })
       return updatedRole
+};
+
+const update_employee = () => {
+    connection.query(
+        `SELECT employee.last_name, role.title FROM employee
+        INNER JOIN role on role.id = employee.role_id
+        INNER JOIN department on department.id = role.department_id`,
+    function(err, val) {
+      if (err) throw err
+      update(val)
+    })
+};
+
+const update = (val) => {
+    inquirer.prompt([
+        {
+            type: "rawlist",
+            message: "name",
+            name: "last_name",
+            choices() {
+                let choiceArray = [];
+                val.forEach((val) => {
+                    choiceArray.push(val.last_name);
+                })
+                return choiceArray
+            }
+
+        },
+        {
+            type: 'list',
+            message: 'change role?',
+            name: "role",
+            choices: getrole()
+        },
+    ]).then((ans)=> {
+    let newid = getrole().indexOf(ans.role) + 1;
+    connection.query(`UPDATE employee SET role_id = '${newid}' where last_name = '${ans.last_name}'`);
+     managerUpdate(ans);
+     update_or_home()
+
+})
 }
+
+const update_or_home = () => {
+    inquirer.prompt({
+        type: "list",
+        message: "choose one of the following options",
+        name: "go",
+        choices: ['go back', 'update more people?']
+    })
+    .then((ans) => {
+        if (ans.go == 'go back') {
+            triggerQ();
+        } else {update_employee()}
+    })
+};
 
         // connection.query(`SELECT employee.last_name FROM employee`),
     // function (err, res) {
