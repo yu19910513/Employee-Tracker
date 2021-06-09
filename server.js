@@ -1,36 +1,3 @@
-// const mysql = require('mysql');
-// const inquirer = require('inquirer');
-// const cTable = require('console.table');
-
-// const connection = mysql.createConnection({
-//   host: 'localhost',
-//   port: 3306,
-//   user: 'root',
-//   password: 'password',
-//   database: 'employeeTracker_DB',
-// });
-
-// const start = () => {
-//     inquirer.prompt([
-//         {
-//             name: 'start',
-//             type: 'confrim',
-//             message: 'Press Y to view employee chart'
-//         }
-//     ]).then((ans) => {
-//         if (ans.start){
-//             // let employeeChart = cTable.getTable(connection.query('SELECT * FROM employeeTracker_DB.employee'));
-//           console.log(connection.query('SELECT * FROM employee'));
-//             connection.end();
-//         } else {connection.end()}
-//     })
-// }
-
-// connection.connect((err) => {
-//     if (err) throw err;
-//     start();
-//   });
-
 const inquirer = require("inquirer")
 const mysql = require("mysql")
 const cTable = require('console.table');
@@ -53,7 +20,7 @@ connection.connect( (err) => {
 const triggerQ = () => {
     inquirer.prompt({
         type: "rawlist",
-        message: "Choose the following task:",
+        message: "Choose one of the following tasks:",
         name: "mainPage",
         choices: [
             'view employees',
@@ -97,7 +64,7 @@ const view_all_employees = () => {
 const edit_remove_add_employee = () => {
     inquirer.prompt({
         type: "rawlist",
-        message: "Choose the following task:",
+        message: "Choose one of the following tasks:",
         name: "choice",
         choices: [
             'update employee',
@@ -125,6 +92,121 @@ const edit_remove_add_employee = () => {
         }
     })
 };
+
+const remove_employee = () => {
+    connection.query(
+        `SELECT employee.last_name, role.title FROM employee
+        INNER JOIN role on role.id = employee.role_id
+        INNER JOIN department on department.id = role.department_id`,
+    function(err, res) {
+      if (err) throw err
+      console.table(res);
+      remove(res)
+    })
+};
+const remove = (res) => {
+    inquirer.prompt([
+        {
+            type: "rawlist",
+            message: "Select the employee to remove from the company",
+            name: "choice",
+            choices() {
+                let choiceArray = [];
+                res.forEach((res) => {
+                    choiceArray.push(res.last_name);
+                })
+                return choiceArray
+            }
+
+        },
+        {
+        type: "list",
+        message: "are you sure?",
+        name: "confrim",
+        choices: ['yes', 'no']
+        }
+    ])
+    .then ((ans) => {
+        if (ans.confrim == 'yes') {
+            connection.query(`SELECT id FROM employee WHERE last_name = "${ans.choice}"`,
+            function(err, res) {
+                if (err) throw err
+                connection.query(`DELETE FROM employee WHERE id = ${res[0].id}`)
+            });
+            console.log(`${ans.choice} is fired!`);
+            proceed_or_home()
+        } else {proceed_or_home()}
+    })
+
+};
+
+const proceed_or_home = () => {
+    inquirer.prompt({
+        type: "list",
+        message: "choose one of the following options",
+        name: "go",
+        choices: ['go back', 'stay in this queue']
+    })
+    .then((ans) => {
+        if (ans.go == 'go back') {
+            triggerQ();
+        } else {remove_employee()}
+    })
+};
+
+const add_employee = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'first name',
+            name: 'first_name'
+        },
+        {
+            type: 'input',
+            message: 'last name',
+            name: 'last_name'
+        },
+        {
+            type: 'list',
+            message: `role`,
+            name: "role",
+            choices: getrole()
+        },
+
+    ]).then((ans)=>{})
+};
+
+var updatedRole = [];
+const getrole = () => {
+      connection.query("SELECT title FROM role", function(err, res) {
+            if (err) throw err
+                for (var i = 0; i < res.length; i++) {
+                    updatedRole.push(res[i].title);
+                }
+        })
+      return updatedRole
+}
+
+        // connection.query(`SELECT employee.last_name FROM employee`),
+    // function (err, res) {
+    //   if (err) throw err
+    //   console.table(res);
+    //   connection.end();
+        // inquirer.prompt({
+        //     name: 'choice',
+        //     type: 'rawlist',
+        //     choices()
+        //     {
+        //         let choiceArray = [];
+        //         res.forEach(() => {
+        //             choiceArray.push(employee.last_name);
+        //         })
+        //         return choiceArray
+        //     }
+
+        // })
+        // .then((ans) => console.log(ans))
+    // }
 
 
 // //============= View All Employees ==========================//
