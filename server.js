@@ -377,9 +377,7 @@ const getDept = () => {
 
 const view_role = () => {
     connection.query(
-        `SELECT role.title, role.salary, department.name FROM employee
-        INNER JOIN role on role.id = employee.role_id
-        INNER JOIN department on department.id = role.department_id`,
+        `SELECT title, salary FROM role`,
     function(err, res) {
       if (err) throw err
       console.table(res)
@@ -388,9 +386,7 @@ const view_role = () => {
 }
 const view_department = () => {
     connection.query(
-        `SELECT employee.last_name, department.name FROM employee
-        INNER JOIN role on role.id = employee.role_id
-        INNER JOIN department on department.id = role.department_id`,
+        `SELECT * FROM department`,
     function(err, res) {
       if (err) throw err
       console.table(res)
