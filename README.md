@@ -15,7 +15,7 @@ No specific installation needed. Users however needs to have npm and node.js on 
 
 ## Usage
 ![demo](img/gif.gif)
-### click her to the deployed app (https://www.youtube.com/watch?v=IqPCX9z24xs)
+### click her to the deployed app (https://www.youtube.com/watch?v=EXFUCTdnP3E)
 
 
 ## Contributing
