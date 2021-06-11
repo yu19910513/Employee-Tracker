@@ -2,7 +2,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Description
-Employee Tracker is an app to help compnay document and track all employees and update role, department, salary, and position transition. The app features editing, removing, adding employees as well as overviewing the compnay personnels as a whole. This project was deveolped via languange tools including inquirer, node.js, console.table, and MyQSL.
+Employee Tracker is an app to help compnay document and track all employees and update role, department, salary, and position transition. The app features editing, removing, adding employees as well as overviewing the compnay personnels as a whole. This project was deveolped via languange tools including inquirer, node.js, console.table, dotenv, and MyQSL.
 
 ## Table of Contents
 - [Installation](#installation)
