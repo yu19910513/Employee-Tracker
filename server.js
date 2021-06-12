@@ -3,6 +3,7 @@ const mysql = require("mysql")
 const cTable = require('console.table');
 require('dotenv').config();
 
+// connection via dotenv
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
     port: 3306,
@@ -11,13 +12,14 @@ const connection = mysql.createConnection({
     database: process.env.DB_NAME
   });
 
-
+// after connection, initiate the first trigger
 connection.connect( (err) => {
     if (err) throw err
     console.log("Connecting @ " + connection.threadId)
     triggerQ();
 });
 
+// home page
 const triggerQ = () => {
     inquirer.prompt({
         type: "rawlist",
@@ -59,6 +61,7 @@ const triggerQ = () => {
         }
     })
 };
+
 
 const view_all_employees = () => {
     connection.query(
@@ -150,7 +153,7 @@ const remove = (res) => {
     })
 
 };
-
+// go-home option
 const delete_or_home = () => {
     inquirer.prompt({
         type: "list",
@@ -197,7 +200,7 @@ const add_employee = () => {
     })
 };
 
-
+// to make all managers have manager_id == employee id
 const managerUpdate = (ans) => {
     if (ans.role == 'manager') {
         connection.query(`SELECT id from employee WHERE employee.last_name = '${ans.last_name}'`, function(err, res) {
@@ -210,7 +213,7 @@ const managerUpdate = (ans) => {
 }
 
 
-
+// go-home option
 const add_or_home = () => {
     inquirer.prompt({
         type: "list",
@@ -225,6 +228,7 @@ const add_or_home = () => {
     })
 };
 
+// to get all up-to-date role list
 var updatedRole = [];
 const getrole = () => {
       connection.query("SELECT title FROM role", function(err, res) {
@@ -276,7 +280,7 @@ const update = (val) => {
 
 })
 }
-
+// go-home option
 const update_or_home = () => {
     inquirer.prompt({
         type: "list",
@@ -305,7 +309,7 @@ const add_department = () => {
       dept_or_home()
     })
 };
-
+// go-home option
 const dept_or_home = () => {
     inquirer.prompt({
         type: "list",
@@ -350,7 +354,7 @@ const add_role = () => {
       })
     });
 };
-
+// go-home option
 const role_or_home = () => {
     inquirer.prompt({
         type: "list",
@@ -364,7 +368,7 @@ const role_or_home = () => {
         } else {add_role()}
     })
 };
-
+// to get the up-to-date dept list
 var updatedDept = [];
 const getDept = () => {
       connection.query("SELECT name FROM department", function(err, res) {
